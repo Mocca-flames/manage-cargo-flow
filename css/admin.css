@@ -69,7 +69,14 @@ h2 {
     border-radius: 10px;
     display: grid;
     place-items: center;
-    font: 700 .8rem var(--font-display)
+    font: 700 .8rem var(--font-display);
+    overflow: hidden
+}
+
+.mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain
 }
 
 .top h1 {
