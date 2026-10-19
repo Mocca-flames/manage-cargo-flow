@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12382f">
+<title>Cargo Flow Africa Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="mark">
+      <img src="logo.png" alt="Cargo Flow Africa" width="40" height="40">
+    </div>
+    <div><h1>Cargo Flow Africa</h1><small><i></i>Website is live</small></div>
+    <button class="who" data-a="who">Director</button>
+  </header>
+
+  <main>
+    <section class="view on" id="v-home"></section>
+    <section class="view" id="v-loads"></section>
+    <section class="view" id="v-registry"></section>
+    <section class="view" id="v-content"></section>
+  </main>
+
+  <button class="fab" id="fab" data-a="fab"><span>+</span><b id="fabTxt">Add</b></button>
+
+  <nav class="tabs" aria-label="Main">
+    <button class="on" data-a="nav" data-id="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10H3z"/></svg>Overview</button>
+    <button data-a="nav" data-id="loads"><svg viewBox="0 0 24 24"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19.5a1.5 1.5 0 100-.01M17 19.5a1.5 1.5 0 100-.01"/></svg>Loads</button>
+    <button data-a="nav" data-id="registry"><svg viewBox="0 0 24 24"><path d="M16 20v-1a4 4 0 00-4-4H8a4 4 0 00-4 4v1M10 11a3 3 0 100-6 3 3 0 000 6M20 20v-1a3 3 0 00-2-2.8M16 5.2a3 3 0 010 5.6"/></svg>Registry</button>
+    <button data-a="nav" data-id="content"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h7"/></svg>Content</button>
+  </nav>
+</div>
+
+<div class="scrim" id="scrim" data-a="close"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sTitle">
+  <div class="sheet-head"><h3 id="sTitle"></h3><button data-a="close" aria-label="Close">&times;</button></div>
+  <div class="sheet-body" id="sBody"></div>
+  <div class="sheet-foot" id="sFoot"></div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
