@@ -85,7 +85,7 @@ Out of scope: driver app, GPS tracking, push notifications, payments.
 | Client state | None. Auth context only. Filters live in the URL (`useSearchParams`). |
 | Styling | Plain CSS with `@layer`, native nesting, CSS variables |
 | PWA | `vite-plugin-pwa` (`generateSW` mode, update prompt) |
-| Hosting | Cloudflare Pages or Netlify, deployed by `git push` |
+| Hosting | Cloudflare Pages via Wrangler (`.pages.dev` or custom domain), not Netlify |
 | APK | Bubblewrap (Trusted Web Activity) |
 
 Why generated types: the backend appears to be FastAPI (Pydantic schemas). FastAPI publishes `/openapi.json`, so the frontend types come from the real API and you write no hand-made API modules.
@@ -101,7 +101,7 @@ Ask the human for anything missing. Write the answers at the top of `README.md`.
 | Backend running locally at | `http://localhost:8000` | Phase 2, 4 |
 | `/openapi.json` reachable | `curl http://localhost:8000/openapi.json` returns JSON | Phase 4 |
 | Production API URL | `https://api.cargoflowafrica.co.za` | Phase 2 |
-| Production web URL | `https://manage.cargoflowafrica.co.za` | Phase 10, 11 |
+| Production web URL | `https://<project>.pages.dev` (or the live Cloudflare `.pages.dev` URL; custom domain later) | Phase 10, 11 |
 | Login endpoint: path, request body, response (token field name) | unknown (not in the API doc) | Phase 5 |
 | Endpoint that returns the current user, **or** confirmation the token is a JWT containing the user fields | unknown | Phase 5 |
 | Change-password endpoint | unknown | Phase 5 |
@@ -308,6 +308,7 @@ VITE_API_URL=https://api.company.com
 - Every rule lives inside a named `@layer`. Unlayered CSS beats all layered CSS and would break the system.
 - Layer order is declared **once**, in `index.css`, and `index.css` is imported **first** in `main.tsx`.
 - Use native nesting (`&`) and CSS variables. Never hardcode colours or spacing inside components. Use tokens.
+- The brand palette is the canonical source of truth. Keep the color names stable and change values in one place when the brand evolves.
 - Global reusable pieces go in `components.css`. Page-specific CSS goes next to its page in `features/<name>/<name>.css`, wrapped in `@layer features { ... }`, and **every class is prefixed with the feature name** (e.g. `.companies-filters`). This prevents collisions.
 - BEM-style naming for parts: `.block`, `.block__part`, `.block--variant`.
 
@@ -322,17 +323,26 @@ VITE_API_URL=https://api.company.com
 ```css
 @layer tokens {
   :root {
-    color-scheme: light dark;
+    color-scheme: light;
 
-    --bg: #f1f5f9;
-    --surface: #ffffff;
-    --surface-2: #f8fafc;
-    --border: #e2e8f0;
-    --text: #0f172a;
-    --muted: #64748b;
+    --color-canvas: #f8f4eb;
+    --color-canvas-alt: #e8d8b9;
+    --color-ink: #12382f;
+    --color-ink-muted: #3d5449;
+    --color-accent-gold: #d4a44c;
+    --color-accent-terracotta: #b9623e;
+    --color-surface: #ffffff;
+    --color-border: #dccba9;
 
-    --brand: #2563eb;
-    --brand-ink: #ffffff;
+    --bg: var(--color-canvas);
+    --surface: var(--color-surface);
+    --surface-2: var(--color-canvas-alt);
+    --border: var(--color-border);
+    --text: var(--color-ink);
+    --muted: var(--color-ink-muted);
+    --brand: var(--color-accent-gold);
+    --brand-ink: var(--color-ink);
+    --brand-alt: var(--color-accent-terracotta);
     --ok: #16a34a;
     --warn: #d97706;
     --danger: #dc2626;
@@ -361,12 +371,18 @@ VITE_API_URL=https://api.company.com
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #0b1220;
-      --surface: #121a2b;
-      --surface-2: #18233a;
-      --border: #243049;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
+      --color-canvas: #12382f;
+      --color-canvas-alt: #1d4e42;
+      --color-ink: #f8f4eb;
+      --color-ink-muted: #dccba9;
+      --color-surface: #183d36;
+      --color-border: #3d5449;
+      --bg: var(--color-canvas);
+      --surface: var(--color-surface);
+      --surface-2: var(--color-canvas-alt);
+      --border: var(--color-border);
+      --text: var(--color-ink);
+      --muted: var(--color-ink-muted);
     }
   }
 }
@@ -1941,28 +1957,28 @@ app.add_middleware(
 
 The APK (TWA) loads the same `https://manage.cargoflowafrica.co.za` origin, so no extra origin is needed for it.
 
-### 14.2 Hosting (Cloudflare Pages or Netlify)
+### 14.2 Hosting (Cloudflare via Wrangler)
 
 1. Push the repo to GitHub/GitLab.
-2. Create a new project, connect the repo.
+2. Create a Cloudflare Pages project or equivalent Wrangler project and connect the repo.
 3. Build command: `npm run build`. Output directory: `dist`.
-4. Environment variable: `VITE_API_URL=https://api.company.com` (this duplicates `.env.production`, which is fine).
-5. Attach your custom domain (HTTPS is mandatory for service workers and TWAs).
-6. Every push to `main` now deploys automatically.
+4. Environment variable: `VITE_API_URL=https://api.cargoflowafrica.co.za` (this duplicates `.env.production`, which is fine).
+5. Use the Cloudflare `.pages.dev` URL or equivalent project domain for the first deployment; add a custom domain later if needed.
+6. Deploy via Wrangler when needed, or let the Cloudflare project deploy automatically on push.
 
 SPA fallback notes:
 
-- **Netlify:** `public/_redirects` (`/*  /index.html  200`) is required.
-- **Cloudflare Pages:** sources disagree about whether this rule is needed or can warn about an "infinite loop". After the first deploy, open a deep link such as `/companies` directly (hard refresh). If it works, you are done. If you get a 404, keep `_redirects`. If the deploy fails with an "infinite loop" error about `_redirects`, delete the file and re-test the deep link.
+- **Cloudflare Pages:** deploy the static `dist` build and test a deep link such as `/companies` directly (hard refresh). If it 404s, keep a fallback route such as `public/_redirects` or the equivalent Cloudflare SPA routing rule. Keep the solution that works in production.
+- **Wrangler**: use the Cloudflare Pages/Workers flow for the project, not a Netlify-specific setup.
 
 Verify headers after deploy:
 
 ```bash
-curl -I https://manage.cargoflowafrica.co.za/sw.js           # Cache-Control: no-cache
-curl -I https://manage.cargoflowafrica.co.za/manifest.webmanifest
+curl -I https://<project>.pages.dev/sw.js           # Cache-Control: no-cache
+curl -I https://<project>.pages.dev/manifest.webmanifest
 ```
 
-**CHECKPOINT 10:** the live URL loads over HTTPS, login works against the production API, deep-link refresh works, Lighthouse says installable. Commit.
+**CHECKPOINT 10:** the live Cloudflare `.pages.dev` URL loads over HTTPS, login works against `https://api.cargoflowafrica.co.za`, deep-link refresh works, Lighthouse says installable. Commit.
 
 ---
 

@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "api": "openapi-typescript http://localhost:8000/openapi.json -o src/api/schema.d.ts",
+    "icons": "pwa-assets-generator"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.105.3",

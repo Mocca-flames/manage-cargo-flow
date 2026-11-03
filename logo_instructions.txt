@@ -1,0 +1,23 @@
+Logo and PWA Assets Instructions
+
+1. Add the logo
+   - Put the source logo as SVG at: public/logo.svg
+   - Requirements: square, simple (suitable for app icons). Prefer monochrome or brand colors that work well masked.
+   - Current brand tokens (for reference): --color-accent-gold: #d4a44c, --color-accent-terracotta: #b9623e, --color-ink: #12382f
+
+2. Generate PWA icons
+   - After adding public/logo.svg, run: npm run icons
+   - This uses @vite-pwa/assets-generator with config pwa-assets.config.ts (preset minimal2023Preset)
+   - Generated files (expected):
+     - public/pwa-64x64.png
+     - public/pwa-192x192.png
+     - public/pwa-512x512.png
+     - public/maskable-icon-512x512.png
+     - public/apple-touch-icon-180x180.png
+     - public/favicon.ico
+
+3. Verify
+   - Ensure vite.config.ts manifest references match the generated filenames
+   - Ensure index.html links to /favicon.ico and /apple-touch-icon-180x180.png
+   - Run: npm run build
+   - If any filename differs from what the generator outputs, update vite.config.ts manifest and index.html accordingly
