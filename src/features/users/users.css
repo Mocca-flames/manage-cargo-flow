@@ -1,0 +1,5 @@
+@layer features {
+  .users-form {
+    max-width: 32rem;
+  }
+}

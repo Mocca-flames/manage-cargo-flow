@@ -48,6 +48,7 @@ Auth status: Wrangle is authenticated; GitHub is also authenticated.
 10. **Do not store anything in `localStorage` except the auth token** (via `src/auth/token.ts`).
 11. **Mobile first.** Every screen must be usable at 360px width. Buttons at least 44px tall.
 12. When this guide says **STOP AND ASK**, stop and ask the human. Do not guess.
+13. **Save every file as UTF-8.** UTF-16 files pass `tsc` but break vite's bundler and oxlint with "stream did not contain valid UTF-8". (PowerShell 5.1's `Out-File` writes UTF-16 by default — write UTF-8 without BOM instead.)
 
 ---
 
@@ -1875,9 +1876,14 @@ Backend behaviour to explain in the UI (hint text under the form):
 
 If the list endpoint is missing, the Users screen contains only the create form. Do not fake a list.
 
-### 11.5 Onboarding
+### 11.5 Onboarding — NOT in scope
 
-The docs only say "/onboarding/*" exists. Check `schema.d.ts`. **STOP AND ASK** the human what the onboarding screens should do before building them.
+Do **not** build onboarding screens in this portal. Verified against the backend (`app/features/onboarding/router.py`):
+
+- `POST /onboarding/start`, `/onboarding/verify-code`, `/onboarding/submit` are **public** (no auth). They implement the transporter self-onboarding flow, which lives in the transporter-facing app (`cargoflow_transport`), not here.
+- `POST /onboarding/staff-submit` requires admin/director, but this portal never calls it directly: `POST /load-interests/{interest_id}/convert` already runs `staff_submit` on the server (see 11.3 Convert).
+
+If a "create company manually" screen is ever wanted, that is a new scope decision — ask the human first.
 
 **CHECKPOINT 8 (per screen):** build and lint pass, the screen works against the real backend (list loads, filters work, an action succeeds and the list refreshes, an error shows a readable message). Commit.
 
@@ -2130,9 +2136,16 @@ Response (UserOut): `{ id, email, full_name, staff_role, is_active }`
 
 Interest fields: `id, load_id, name, email, phone, company_name, truck_reg, message, status, handled_by, handled_at, created_at`
 
-### Onboarding
+### Onboarding (not used by this portal)
 
-`/onboarding/*` operations exist (admin, director). Details are in the onboarding router and must be read from `schema.d.ts`.
+| Method | Endpoint | Auth | Used by |
+|---|---|---|---|
+| POST | /onboarding/start | public | Transporter app (self-onboarding) |
+| POST | /onboarding/verify-code | public | Transporter app |
+| POST | /onboarding/submit | public | Transporter app |
+| POST | /onboarding/staff-submit | admin, director | Called server-side by POST /load-interests/{interest_id}/convert; no management screen |
+
+Management portal: no onboarding screens (out of scope). Lead conversion in the Load interests screen covers staff-side onboarding.
 
 ### Not documented (must come from `schema.d.ts` or the human)
 
@@ -2159,6 +2172,7 @@ Login, current user, change password, allowed company `status` values, how docum
 | Cloudflare rejects `_redirects` ("infinite loop") | Host handles SPA fallback itself | Delete `public/_redirects`, redeploy, test a deep link |
 | Logged out immediately after login | A 401 from another call right after login | Check the token field name used in `requestToken` and the Authorization header |
 | `login` succeeds but a non-admin role gets in | `can.usePortal` not applied | Confirm the check in `AuthProvider.login` |
+| Build or oxlint fails with "stream did not contain valid UTF-8" | File was saved as UTF-16 (PowerShell 5.1 `Out-File` default) | Re-save the file as UTF-8 without BOM; see rule 13 |
 
 ---
 

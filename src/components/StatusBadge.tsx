@@ -1,9 +1,9 @@
 const VARIANT: Record<string, 'ok' | 'warn' | 'danger' | 'info' | ''> = {
   verified: 'ok', approved: 'ok', onboarded: 'ok', active: 'ok',
-  pending: 'warn', expired: 'warn',
+  pending: 'warn', expired: 'warn', unverified: 'warn',
   new: 'info', contacted: 'info',
-  rejected: 'danger', inactive: 'danger',
-  dismissed: '',
+  rejected: 'danger', inactive: 'danger', suspended: 'danger',
+  dismissed: '', superseded: '',
 };
 export function StatusBadge({ status }: { status: string }) {
   const v = VARIANT[status.toLowerCase()] ?? '';

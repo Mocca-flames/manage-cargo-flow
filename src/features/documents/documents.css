@@ -1,0 +1,5 @@
+@layer features {
+  .documents-filters {
+    align-items: end;
+  }
+}
