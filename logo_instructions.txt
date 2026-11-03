@@ -1,3 +1,4 @@
+
 Logo and PWA Assets Instructions
 
 1. Add the logo
