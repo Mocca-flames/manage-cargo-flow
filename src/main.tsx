@@ -1,6 +1,9 @@
 ﻿import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router'
+import { ToastProvider } from './components/toast'
+import { OfflineBanner } from './components/OfflineBanner'
+import { UpdateToast } from './components/UpdateToast'
 import { router } from './router'
 import './styles/index.css'
 import './styles/tokens.css'
@@ -10,6 +13,10 @@ import './styles/components.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ToastProvider>
+      <OfflineBanner />
+      <RouterProvider router={router} />
+      <UpdateToast />
+    </ToastProvider>
   </StrictMode>,
 )
