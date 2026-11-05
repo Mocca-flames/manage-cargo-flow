@@ -1,7 +1,7 @@
-﻿import { createContext, useContext, useEffect, useState } from "react";
+﻿import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { getToken, setToken } from "../token";
-import { fetchCurrentUser, requestToken } from "../authApi";
+import { fetchCurrentUser, requestToken, verifyLoginOtp } from "../authApi";
 import type { AuthUser } from "../types";
 import { queryClient } from "../../lib/queryClient";
 
@@ -9,7 +9,9 @@ interface AuthContextValue {
   user: AuthUser | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  /** Resolves "ok" when signed in, "otp" when a verification code was emailed. */
+  login: (email: string, password: string) => Promise<"ok" | "otp">;
+  verifyOtp: (code: string, rememberDevice: boolean) => Promise<void>;
   logout: () => void;
   refresh: () => Promise<void>;
 }
@@ -20,18 +22,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(getToken());
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const pendingEmail = useRef<string | null>(null);
 
   async function loadUser() {
     const t = getToken();
     if (!t) {
       setUser(null);
+      setTokenState(null);
       setLoading(false);
       return;
     }
     try {
       const u = await fetchCurrentUser();
       setUser(u);
-    } catch (e) {
+      setTokenState(t);
+    } catch {
       setToken(null);
       setTokenState(null);
       setUser(null);
@@ -49,10 +54,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("auth:expired", onExpired);
   }, []);
 
-  async function login(email: string, password: string) {
-    const t = await requestToken(email, password);
-    setToken(t);
-    setTokenState(t);
+  async function login(email: string, password: string): Promise<"ok" | "otp"> {
+    const result = await requestToken(email, password);
+    if (result.otpRequired) {
+      pendingEmail.current = email;
+      return "otp";
+    }
+    setTokenState(getToken());
+    const u = await fetchCurrentUser();
+    setUser(u);
+    return "ok";
+  }
+
+  async function verifyOtp(code: string, rememberDevice: boolean): Promise<void> {
+    const email = pendingEmail.current;
+    if (!email) throw new Error("Please sign in again.");
+    await verifyLoginOtp(email, code, rememberDevice);
+    setTokenState(getToken());
     const u = await fetchCurrentUser();
     setUser(u);
   }
@@ -70,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout, refresh }}>
+    <AuthContext.Provider value={{ user, token, loading, login, verifyOtp, logout, refresh }}>
       {children}
     </AuthContext.Provider>
   );

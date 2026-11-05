@@ -1,4 +1,4 @@
-﻿import { createBrowserRouter } from "react-router";
+﻿import { createBrowserRouter, Outlet } from "react-router";
 import { AuthProvider } from "./auth/context/AuthContext";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { Login } from "./features/auth/Login";
@@ -18,7 +18,7 @@ export const router = createBrowserRouter([
     element: (
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <AppShell />
+          <Outlet />
         </AuthProvider>
       </QueryClientProvider>
     ),
@@ -28,12 +28,17 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
-          { index: true, element: <Home /> },
-          { path: "/companies", element: <Companies /> },
-          { path: "/companies/:id", element: <CompanyDetail /> },
-          { path: "/documents", element: <Documents /> },
-          { path: "/interests", element: <Interests /> },
-          { path: "/users", element: <Users /> },
+          {
+            element: <AppShell />,
+            children: [
+              { index: true, element: <Home /> },
+              { path: "/companies", element: <Companies /> },
+              { path: "/companies/:id", element: <CompanyDetail /> },
+              { path: "/documents", element: <Documents /> },
+              { path: "/interests", element: <Interests /> },
+              { path: "/users", element: <Users /> },
+            ],
+          },
         ],
       },
     ],

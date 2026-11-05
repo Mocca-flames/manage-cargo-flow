@@ -9,5 +9,5 @@ function subscribe(cb: () => void) {
 export function OfflineBanner() {
   const online = useSyncExternalStore(subscribe, () => navigator.onLine, () => true);
   if (online) return null;
-  return <div className='offline-banner' role='status'>You are offline. Changes cannot be saved.</div>;
+  return <div className='offline-banner' role='status'>Offline — changes won&rsquo;t save.</div>;
 }

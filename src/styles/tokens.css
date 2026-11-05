@@ -2,6 +2,7 @@
   :root {
     color-scheme: light;
 
+    /* Color — Cargo Flow Africa warm earth palette (no dark mode, no green backgrounds) */
     --color-canvas: #f8f4eb;
     --color-canvas-alt: #e8d8b9;
     --color-ink: #12382f;
@@ -20,46 +21,63 @@
     --brand: var(--color-accent-gold);
     --brand-ink: var(--color-ink);
     --brand-alt: var(--color-accent-terracotta);
-    --ok: #16a34a;
-    --warn: #d97706;
-    --danger: #dc2626;
-    --info: #0891b2;
 
-    --radius: 0.625rem;
-    --radius-sm: 0.375rem;
+    --ok: #16553f;
+    --ok-bg: #d8eadf;
+    --warn: #7a5410;
+    --warn-bg: #f6e6c2;
+    --danger: #8a3d1f;
+    --danger-bg: #f4d9cc;
+    --info: #0d6a85;
+    --info-bg: #d9eaf2;
 
+    /* Typography */
+    --font-display: "Sora", system-ui, sans-serif;
+    --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font: var(--font-body);
+
+    --text-display-l: clamp(2.25rem, 4vw + 0.5rem, 3.5rem);
+    --text-display-m: clamp(1.25rem, 2vw + 0.25rem, 1.75rem);
+    --text-body-l: clamp(1.125rem, 1vw + 0.5rem, 1.25rem);
+    --text-body-m: clamp(0.9375rem, 0.5vw + 0.5rem, 1rem);
+    --text-label: clamp(0.75rem, 0.5vw + 0.5rem, 0.875rem);
+
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.25rem;
+    --text-xl: 1.5rem;
+
+    /* Spacing (4px base) */
     --space-1: 0.25rem;
     --space-2: 0.5rem;
     --space-3: 0.75rem;
     --space-4: 1rem;
     --space-5: 1.5rem;
     --space-6: 2rem;
+    --space-8: 2.5rem;
+    --space-12: 3rem;
 
-    --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --text-sm: 0.875rem;
-    --text-base: 1rem;
-    --text-lg: 1.25rem;
-    --text-xl: 1.5rem;
+    /* Radii */
+    --radius: 1.25rem;
+    --radius-sm: 0.875rem;
+    --radius-input: 0.75rem;
+    --radius-pill: 99px;
 
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 4px 12px rgb(0 0 0 / 0.06);
-    --tap: 2.75rem; /* minimum touch target */
+    /* Motion */
+    --ease-snap: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --duration-fast: 200ms;
+    --duration-base: 500ms;
+
+    --shadow: 0 1px 3px rgb(18 56 47 / 0.15);
+    --tap: 2.75rem;
     --header-h: 3.5rem;
-  }
+    --app-max: 430px;
+    --nav-h: 64px;
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --color-canvas: #12382f;
-      --color-canvas-alt: #1d4e42;
-      --color-ink: #f8f4eb;
-      --color-ink-muted: #dccba9;
-      --color-surface: #183d36;
-      --color-border: #3d5449;
-      --bg: var(--color-canvas);
-      --surface: var(--color-surface);
-      --surface-2: var(--color-canvas-alt);
-      --border: var(--color-border);
-      --text: var(--color-ink);
-      --muted: var(--color-ink-muted);
-    }
+    /* Z-index */
+    --z-data: 10;
+    --z-nav: 100;
+    --z-sheet: 120;
+    --z-toast: 200;
   }
 }

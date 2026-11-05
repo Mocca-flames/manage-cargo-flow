@@ -6,7 +6,6 @@ import type { components } from "../../api/schema";
 import { errorMessage } from "../../api/errors";
 import { useAuth } from "../../auth/context/AuthContext";
 import { can } from "../../auth/permissions";
-import { DataTable, type Column } from "../../components/DataTable";
 import { Pagination } from "../../components/Pagination";
 import { StatusBadge } from "../../components/StatusBadge";
 import { Field } from "../../components/Field";
@@ -57,35 +56,6 @@ export function Interests() {
     void queryClient.invalidateQueries();
   }
 
-  const columns: Column<Interest>[] = [
-    { header: "Name", cell: (i) => i.full_name },
-    { header: "Phone", cell: (i) => i.phone },
-    {
-      header: "Load",
-      cell: (i) => `#${i.load_id} ${i.load_origin} → ${i.load_destination}`,
-    },
-    { header: "Truck type", cell: (i) => i.truck_type ?? "-" },
-    { header: "Status", cell: (i) => <StatusBadge status={i.status} /> },
-    { header: "Note", cell: (i) => i.note ?? "-" },
-    { header: "Created", cell: (i) => fmtDate(i.created_at) },
-    {
-      header: "",
-      cell: (i) =>
-        can.handleInterests(user?.staff_role) ? (
-          <span className="cluster">
-            <button className="btn btn--sm" onClick={() => setEditing(i)}>
-              Update
-            </button>
-            {i.status !== "onboarded" && i.company_id === null && (
-              <button className="btn btn--sm btn--primary" onClick={() => setConverting(i)}>
-                Convert
-              </button>
-            )}
-          </span>
-        ) : null,
-    },
-  ];
-
   const rows = data ?? [];
 
   return (
@@ -94,20 +64,24 @@ export function Interests() {
         <h1>Load interests</h1>
       </header>
 
+      <div className="chips" role="group" aria-label="Filter by status">
+        <button type="button" className={status === "" ? "on" : ""} onClick={() => update("status", "")}>
+          All
+        </button>
+        {STATUS_OPTIONS.map((s) => (
+          <button
+            key={s}
+            type="button"
+            className={status === s ? "on" : ""}
+            onClick={() => update("status", s)}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+
       <div className="filters interests-filters">
-        <Field label="Status">
-          {(id) => (
-            <select id={id} value={status} onChange={(e) => update("status", e.target.value)}>
-              <option value="">All</option>
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          )}
-        </Field>
-        <Field label="Load ID" hint="Leave empty for all loads.">
+        <Field label="Load ID" hint="Empty = all loads.">
           {(id) => (
             <input
               id={id}
@@ -120,30 +94,54 @@ export function Interests() {
         </Field>
       </div>
 
-      <section className="card">
-        {isPending && <p className="muted">Loading...</p>}
-        {error && (
-          <p className="error-text" role="alert">
-            {errorMessage(error)}
-          </p>
-        )}
-        {!isPending && !error && (
-          <>
-            <DataTable
-              rows={rows}
-              columns={columns}
-              rowKey={(i) => i.id}
-              empty="No interests match this filter."
-            />
-            <Pagination
-              offset={offset}
-              limit={LIMIT}
-              count={rows.length}
-              onChange={(o) => update("offset", String(o))}
-            />
-          </>
-        )}
-      </section>
+      {isPending && <p className="muted">Loading...</p>}
+      {error && (
+        <p className="error-text" role="alert">
+          {errorMessage(error)}
+        </p>
+      )}
+      {!isPending && !error && rows.length === 0 && (
+        <p className="empty">No interests match this filter.</p>
+      )}
+      {!isPending &&
+        !error &&
+        rows.map((i) => (
+          <article className="rec" key={i.id}>
+            <div className="rec__row">
+              <span className="rec__title">{i.full_name}</span>
+              <StatusBadge status={i.status} />
+            </div>
+            <div className="rec__meta">{i.phone}</div>
+            <div className="rec__route">
+              <span>#{i.load_id} {i.load_origin}</span>
+              <span>{i.load_destination}</span>
+            </div>
+            <div className="rec__meta">
+              {i.truck_type ?? "Any truck"} · {fmtDate(i.created_at)}
+            </div>
+            {i.note && <div className="rec__note">{i.note}</div>}
+            {can.handleInterests(user?.staff_role) && (
+              <div className="rec__actions">
+                <button className="btn btn--sm" onClick={() => setEditing(i)}>
+                  Update
+                </button>
+                {i.status !== "onboarded" && i.company_id === null && (
+                  <button className="btn btn--sm btn--primary" onClick={() => setConverting(i)}>
+                    Convert
+                  </button>
+                )}
+              </div>
+            )}
+          </article>
+        ))}
+      {!isPending && !error && rows.length > 0 && (
+        <Pagination
+          offset={offset}
+          limit={LIMIT}
+          count={rows.length}
+          onChange={(o) => update("offset", String(o))}
+        />
+      )}
 
       <UpdateInterestModal
         interest={editing}
@@ -216,7 +214,7 @@ function UpdateInterestModal({ interest, onClose, onDone }: ModalProps) {
           </select>
         )}
       </Field>
-      <Field label="Note (optional)" hint="Max 1000 characters. Shown to staff only.">
+      <Field label="Note (optional)" hint="Max 1000 · staff only">
         {(id) => (
           <textarea
             id={id}
@@ -281,10 +279,12 @@ function ConvertLeadModal({ interest, onClose, onDone }: ModalProps) {
   if (isBroker) roles.push("broker");
 
   const list = (s: string) =>
-    s
-      .split(/[,\n]/)
-      .map((x) => x.trim())
-      .filter(Boolean);
+    [...new Set(
+      s
+        .split(/[,\n]/)
+        .map((x) => x.trim())
+        .filter(Boolean),
+    )];
 
   const valid =
     legalName.trim() !== "" &&
@@ -307,7 +307,7 @@ function ConvertLeadModal({ interest, onClose, onDone }: ModalProps) {
       },
       roles,
       transporter: isTransporter
-        ? { operating_countries: list(operatingCountries).map((c) => c.toUpperCase()) }
+        ? { operating_countries: [...new Set(list(operatingCountries).map((c) => c.toUpperCase()))] }
         : null,
       broker: isBroker
         ? { corridors: list(corridors), finds_trucks: findsTrucks }
@@ -351,7 +351,7 @@ function ConvertLeadModal({ interest, onClose, onDone }: ModalProps) {
             id={id}
             value={countryCode}
             maxLength={2}
-            onChange={(e) => setCountryCode(e.target.value.toUpperCase())}
+            onChange={(e) => setCountryCode(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))}
             required
           />
         )}

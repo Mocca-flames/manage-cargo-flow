@@ -2,12 +2,10 @@ import { useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { $api, client } from "../../api/client";
-import type { components } from "../../api/schema";
 import { errorMessage } from "../../api/errors";
 import { useAuth } from "../../auth/context/AuthContext";
 import { can } from "../../auth/permissions";
 import { getToken } from "../../auth/token";
-import { DataTable, type Column } from "../../components/DataTable";
 import { Pagination } from "../../components/Pagination";
 import { StatusBadge } from "../../components/StatusBadge";
 import { Field } from "../../components/Field";
@@ -15,8 +13,6 @@ import { useToast } from "../../components/toast";
 import { fmtDate } from "../../lib/format";
 import { DocReviewModal } from "../companies/DocReviewModal";
 import "./documents.css";
-
-type Document = components["schemas"]["DocumentOut"];
 
 const LIMIT = 50;
 // Real values from the backend (documents router status pattern).
@@ -81,40 +77,6 @@ export function Documents() {
     void queryClient.invalidateQueries();
   }
 
-  const columns: Column<Document>[] = [
-    {
-      header: "Document",
-      cell: (d) => d.custom_label ?? d.original_filename,
-    },
-    {
-      header: "Company",
-      cell: (d) =>
-        d.company_id ? <Link to={`/companies/${d.company_id}`}>#{d.company_id}</Link> : "-",
-    },
-    { header: "Status", cell: (d) => <StatusBadge status={d.status} /> },
-    { header: "Expiry", cell: (d) => fmtDate(d.expiry_date) },
-    { header: "Uploaded", cell: (d) => fmtDate(d.created_at) },
-    {
-      header: "",
-      cell: (d) => (
-        <span className="cluster">
-          <button
-            className="btn btn--sm"
-            disabled={downloading === d.id}
-            onClick={() => void onDownload(d.id, d.original_filename)}
-          >
-            {downloading === d.id ? "..." : "Download"}
-          </button>
-          {can.reviewDocuments(user?.staff_role) && d.status === "pending" && (
-            <button className="btn btn--sm btn--primary" onClick={() => setReviewDocId(d.id)}>
-              Review
-            </button>
-          )}
-        </span>
-      ),
-    },
-  ];
-
   const rows = data ?? [];
 
   return (
@@ -123,20 +85,24 @@ export function Documents() {
         <h1>Documents</h1>
       </header>
 
+      <div className="chips" role="group" aria-label="Filter by status">
+        <button type="button" className={status === "" ? "on" : ""} onClick={() => update("status", "")}>
+          All
+        </button>
+        {STATUS_OPTIONS.map((s) => (
+          <button
+            key={s}
+            type="button"
+            className={status === s ? "on" : ""}
+            onClick={() => update("status", s)}
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+
       <div className="filters documents-filters">
-        <Field label="Status">
-          {(id) => (
-            <select id={id} value={status} onChange={(e) => update("status", e.target.value)}>
-              <option value="">All</option>
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          )}
-        </Field>
-        <Field label="Company ID" hint="Leave empty for all companies.">
+        <Field label="Company ID" hint="Empty = all companies.">
           {(id) => (
             <input
               id={id}
@@ -149,30 +115,50 @@ export function Documents() {
         </Field>
       </div>
 
-      <section className="card">
-        {isPending && <p className="muted">Loading...</p>}
-        {error && (
-          <p className="error-text" role="alert">
-            {errorMessage(error)}
-          </p>
-        )}
-        {!isPending && !error && (
-          <>
-            <DataTable
-              rows={rows}
-              columns={columns}
-              rowKey={(d) => d.id}
-              empty="No documents match this filter."
-            />
-            <Pagination
-              offset={offset}
-              limit={LIMIT}
-              count={rows.length}
-              onChange={(o) => update("offset", String(o))}
-            />
-          </>
-        )}
-      </section>
+      {isPending && <p className="muted">Loading...</p>}
+      {error && (
+        <p className="error-text" role="alert">
+          {errorMessage(error)}
+        </p>
+      )}
+      {!isPending && !error && rows.length === 0 && (
+        <p className="empty">No documents match this filter.</p>
+      )}
+      {!isPending &&
+        !error &&
+        rows.map((d) => (
+          <article className="rec" key={d.id}>
+            <div className="rec__row">
+              <span className="rec__title">{d.custom_label ?? d.original_filename}</span>
+              <StatusBadge status={d.status} />
+            </div>
+            <div className="rec__meta">
+              {d.company_id ? <Link to={`/companies/${d.company_id}`}>Company #{d.company_id}</Link> : "No company"} · Expiry {fmtDate(d.expiry_date)} · Uploaded {fmtDate(d.created_at)}
+            </div>
+            <div className="rec__actions">
+              <button
+                className="btn btn--sm"
+                disabled={downloading === d.id}
+                onClick={() => void onDownload(d.id, d.original_filename)}
+              >
+                {downloading === d.id ? "..." : "Download"}
+              </button>
+              {can.reviewDocuments(user?.staff_role) && d.status === "pending" && (
+                <button className="btn btn--sm btn--primary" onClick={() => setReviewDocId(d.id)}>
+                  Review
+                </button>
+              )}
+            </div>
+          </article>
+        ))}
+      {!isPending && !error && rows.length > 0 && (
+        <Pagination
+          offset={offset}
+          limit={LIMIT}
+          count={rows.length}
+          onChange={(o) => update("offset", String(o))}
+        />
+      )}
 
       <DocReviewModal docId={reviewDocId} onClose={() => setReviewDocId(null)} onDone={refresh} />
     </>

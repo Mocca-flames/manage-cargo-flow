@@ -38,7 +38,8 @@ export function ChangePassword() {
         </div>
         <div className="field">
           <label htmlFor="new">New password</label>
-          <input id="new" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+          <input id="new" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} minLength={10} required />
+          <span className="field__hint muted">At least 10 characters.</span>
         </div>
         {error && <div className="error-text">{error}</div>}
         <div className="cluster">

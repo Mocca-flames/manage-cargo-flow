@@ -1,15 +1,10 @@
 import { Link, useSearchParams } from "react-router";
 import { $api } from "../../api/client";
-import type { components } from "../../api/schema";
 import { errorMessage } from "../../api/errors";
-import { DataTable, type Column } from "../../components/DataTable";
 import { Pagination } from "../../components/Pagination";
 import { StatusBadge } from "../../components/StatusBadge";
-import { Field } from "../../components/Field";
 import { fmtDate } from "../../lib/format";
 import "./companies.css";
-
-type Company = components["schemas"]["CompanyListItem"];
 
 const LIMIT = 50;
 // Real values from the backend (app/features/companies/models.py COMPANY_STATUSES).
@@ -32,15 +27,6 @@ export function Companies() {
     setParams(next);
   }
 
-  const columns: Column<Company>[] = [
-    { header: "Company", cell: (c) => <Link to={`/companies/${c.id}`}>{c.trading_name ?? c.legal_name}</Link> },
-    { header: "Reg. no.", cell: (c) => c.registration_number },
-    { header: "Country", cell: (c) => c.country_code },
-    { header: "Roles", cell: (c) => c.roles.join(", ") },
-    { header: "Status", cell: (c) => <StatusBadge status={c.status} /> },
-    { header: "Created", cell: (c) => fmtDate(c.created_at) },
-  ];
-
   const rows = data ?? [];
 
   return (
@@ -49,45 +35,58 @@ export function Companies() {
         <h1>Companies</h1>
       </header>
 
-      <div className="filters companies-filters">
-        <Field label="Status">
-          {(id) => (
-            <select id={id} value={status} onChange={(e) => update("status", e.target.value)}>
-              <option value="">All</option>
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          )}
-        </Field>
+      <div className="chips" role="group" aria-label="Filter by status">
+        <button type="button" className={status === "" ? "on" : ""} onClick={() => update("status", "")}>
+          All
+        </button>
+        {STATUS_OPTIONS.map((s) => (
+          <button
+            key={s}
+            type="button"
+            className={status === s ? "on" : ""}
+            onClick={() => update("status", s)}
+          >
+            {s}
+          </button>
+        ))}
       </div>
 
-      <section className="card">
-        {isPending && <p className="muted">Loading...</p>}
-        {error && (
-          <p className="error-text" role="alert">
-            {errorMessage(error)}
-          </p>
-        )}
-        {!isPending && !error && (
-          <>
-            <DataTable
-              rows={rows}
-              columns={columns}
-              rowKey={(c) => c.id}
-              empty="No companies match this filter."
-            />
-            <Pagination
-              offset={offset}
-              limit={LIMIT}
-              count={rows.length}
-              onChange={(o) => update("offset", String(o))}
-            />
-          </>
-        )}
-      </section>
+      {isPending && <p className="muted">Loading...</p>}
+      {error && (
+        <p className="error-text" role="alert">
+          {errorMessage(error)}
+        </p>
+      )}
+      {!isPending && !error && rows.length === 0 && (
+        <p className="empty">No companies match this filter.</p>
+      )}
+      {!isPending &&
+        !error &&
+        rows.map((c) => (
+          <Link className="rec" key={c.id} to={`/companies/${c.id}`}>
+            <div className="rec__row">
+              <span className="rec__title">{c.trading_name ?? c.legal_name}</span>
+              <StatusBadge status={c.status} />
+            </div>
+            <div className="rec__meta">
+              {c.registration_number} · {c.country_code}
+            </div>
+            <div className="tags">
+              {c.roles.map((r) => (
+                <span key={r}>{r}</span>
+              ))}
+            </div>
+            <div className="rec__meta">Created {fmtDate(c.created_at)}</div>
+          </Link>
+        ))}
+      {!isPending && !error && rows.length > 0 && (
+        <Pagination
+          offset={offset}
+          limit={LIMIT}
+          count={rows.length}
+          onChange={(o) => update("offset", String(o))}
+        />
+      )}
     </>
   );
 }

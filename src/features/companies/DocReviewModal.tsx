@@ -29,8 +29,11 @@ export function DocReviewModal({ docId, onClose, onDone }: Props) {
     setExpiry("");
   }
 
+  // Backend rejects a rejection without a note (422 "A note is required when rejecting").
+  const noteOk = decision !== "rejected" || note.trim().length > 0;
+
   function submit() {
-    if (docId === null) return;
+    if (docId === null || !noteOk) return;
     review.mutate(
       {
         params: { path: { doc_id: docId } },
@@ -72,18 +75,19 @@ export function DocReviewModal({ docId, onClose, onDone }: Props) {
           )}
         </Field>
       )}
-      <Field label="Note (optional)">
+      <Field label={decision === "rejected" ? "Note *" : "Note (optional)"}>
         {(id) => (
           <textarea id={id} value={note} onChange={(e) => setNote(e.target.value)} maxLength={1000} />
         )}
       </Field>
       <div className="modal__actions">
-        <button className="btn" onClick={onClose}>
+        <button type="button" className="btn" onClick={onClose}>
           Cancel
         </button>
         <button
+          type="button"
           className="btn btn--primary"
-          disabled={review.isPending}
+          disabled={review.isPending || !noteOk}
           onClick={submit}
         >
           {review.isPending ? "Saving..." : "Save decision"}

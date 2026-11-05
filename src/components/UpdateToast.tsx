@@ -19,7 +19,7 @@ export function UpdateToast() {
   if (!needRefresh) return null;
   return (
     <div className='update-banner' role='status'>
-      <span>A new version is available. Reloading discards unsaved changes.</span>
+      <span>New version ready — reload?</span>
       <button className='btn btn--primary btn--sm' onClick={() => void updateServiceWorker(true)}>Reload</button>
       <button className='btn btn--ghost btn--sm' onClick={() => setNeedRefresh(false)}>Later</button>
     </div>

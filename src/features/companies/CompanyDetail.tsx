@@ -8,7 +8,6 @@ import { can } from "../../auth/permissions";
 import { Modal } from "../../components/Modal";
 import { Field } from "../../components/Field";
 import { StatusBadge } from "../../components/StatusBadge";
-import { DataTable, type Column } from "../../components/DataTable";
 import { useToast } from "../../components/toast";
 import { fmtDate } from "../../lib/format";
 import { getToken } from "../../auth/token";
@@ -85,15 +84,16 @@ export function CompanyDetail() {
         parseAs: "blob",
         headers: { Authorization: `Bearer ${getToken() ?? ""}` },
       });
-      if (dlError || !(data instanceof Blob)) {
+      if (data instanceof Blob) {
+        const url = URL.createObjectURL(data);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      } else {
         throw dlError ?? new Error("Download failed");
       }
-      const url = URL.createObjectURL(data);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
     } catch (e) {
       toast.push(errorMessage(e), "error");
     } finally {
@@ -110,41 +110,6 @@ export function CompanyDetail() {
     );
 
   const reasonOk = reason.trim().length >= 3 && reason.trim().length <= 1000;
-
-  const docColumns: Column<CompanyDoc>[] = [
-    {
-      header: "Document",
-      cell: (d) => d.type_name ?? d.custom_label ?? d.original_filename,
-    },
-    { header: "File", cell: (d) => d.original_filename },
-    { header: "Status", cell: (d) => <StatusBadge status={d.status} /> },
-    { header: "Expiry", cell: (d) => fmtDate(d.expiry_date) },
-    {
-      header: "",
-      cell: (d) => (
-        <span className="cluster">
-          <button
-            className="btn btn--sm"
-            disabled={downloading === d.id}
-            onClick={() => void onDownload(d.id, d.original_filename)}
-          >
-            {downloading === d.id ? "..." : "Download"}
-          </button>
-          {can.reviewDocuments(user?.staff_role) && d.status === "pending" && (
-            <button className="btn btn--sm btn--primary" onClick={() => setReviewDocId(d.id)}>
-              Review
-            </button>
-          )}
-        </span>
-      ),
-    },
-  ];
-
-  const userColumns: Column<{ id: number; full_name: string; email: string; phone: string | null }>[] = [
-    { header: "Name", cell: (u) => u.full_name },
-    { header: "Email", cell: (u) => u.email },
-    { header: "Phone", cell: (u) => u.phone ?? "-" },
-  ];
 
   return (
     <>
@@ -174,83 +139,111 @@ export function CompanyDetail() {
         </div>
       </header>
 
-      <div className="grid-2">
-        <section className="card">
-          <h2>Details</h2>
-          <dl className="kv">
-            <dt>Legal name</dt>
-            <dd>{company.legal_name}</dd>
-            <dt>Reg. number</dt>
-            <dd>{company.registration_number}</dd>
-            <dt>Country</dt>
-            <dd>{company.country_code}</dd>
-            <dt>Tax number</dt>
-            <dd>{company.tax_number ?? "-"}</dd>
-            <dt>VAT number</dt>
-            <dd>{company.vat_number ?? "-"}</dd>
-            <dt>Email</dt>
-            <dd>{company.email ?? "-"}</dd>
-            <dt>Phone</dt>
-            <dd>{company.phone ?? "-"}</dd>
-            <dt>Address</dt>
-            <dd>{company.address ?? "-"}</dd>
-            <dt>City</dt>
-            <dd>{company.city ?? "-"}</dd>
-            <dt>Roles</dt>
-            <dd>{company.roles.join(", ")}</dd>
-            <dt>Operating countries</dt>
-            <dd>{company.operating_countries?.join(", ") ?? "-"}</dd>
-            <dt>Corridors</dt>
-            <dd>{company.corridors?.join(", ") ?? "-"}</dd>
-            <dt>Created</dt>
-            <dd>{fmtDate(company.created_at)}</dd>
-            {company.verified_at && (
-              <>
-                <dt>Verified</dt>
-                <dd>{fmtDate(company.verified_at)}</dd>
-              </>
-            )}
-            {company.rejection_reason && (
-              <>
-                <dt>Rejection reason</dt>
-                <dd>{company.rejection_reason}</dd>
-              </>
-            )}
-          </dl>
-        </section>
-
-        <section className="card">
-          <h2>Missing documents</h2>
-          {company.missing_documents.length === 0 ? (
-            <p className="muted">None.</p>
-          ) : (
-            <ul>
-              {company.missing_documents.map((m) => (
-                <li key={m}>{m}</li>
-              ))}
-            </ul>
+      <section className="card">
+        <h2>Details</h2>
+        <dl className="kv">
+          <dt>Legal name</dt>
+          <dd>{company.legal_name}</dd>
+          <dt>Reg. number</dt>
+          <dd>{company.registration_number}</dd>
+          <dt>Country</dt>
+          <dd>{company.country_code}</dd>
+          <dt>Tax number</dt>
+          <dd>{company.tax_number ?? "-"}</dd>
+          <dt>VAT number</dt>
+          <dd>{company.vat_number ?? "-"}</dd>
+          <dt>Email</dt>
+          <dd>{company.email ?? "-"}</dd>
+          <dt>Phone</dt>
+          <dd>{company.phone ?? "-"}</dd>
+          <dt>Address</dt>
+          <dd>{company.address ?? "-"}</dd>
+          <dt>City</dt>
+          <dd>{company.city ?? "-"}</dd>
+          <dt>Roles</dt>
+          <dd>{company.roles.join(", ")}</dd>
+          <dt>Operating countries</dt>
+          <dd>{company.operating_countries?.join(", ") ?? "-"}</dd>
+          <dt>Corridors</dt>
+          <dd>{company.corridors?.join(", ") ?? "-"}</dd>
+          <dt>Created</dt>
+          <dd>{fmtDate(company.created_at)}</dd>
+          {company.verified_at && (
+            <>
+              <dt>Verified</dt>
+              <dd>{fmtDate(company.verified_at)}</dd>
+            </>
           )}
-        </section>
-      </div>
+          {company.rejection_reason && (
+            <>
+              <dt>Rejection reason</dt>
+              <dd>{company.rejection_reason}</dd>
+            </>
+          )}
+        </dl>
+      </section>
+
+      <section className="card">
+        <h2>Missing documents</h2>
+        {company.missing_documents.length === 0 ? (
+          <p className="muted">None.</p>
+        ) : (
+          <div className="tags">
+            {company.missing_documents.map((m) => (
+              <span key={m}>{m}</span>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="card">
         <h2>Documents</h2>
-        <DataTable
-          rows={company.documents}
-          columns={docColumns}
-          rowKey={(d) => d.id}
-          empty="No documents uploaded yet."
-        />
+        {company.documents.length === 0 ? (
+          <p className="empty">No documents uploaded yet.</p>
+        ) : (
+          company.documents.map((d: CompanyDoc) => (
+            <article className="rec" key={d.id}>
+              <div className="rec__row">
+                <span className="rec__title">{d.type_name ?? d.custom_label ?? d.original_filename}</span>
+                <StatusBadge status={d.status} />
+              </div>
+              <div className="rec__meta">
+                {d.original_filename} · Expiry {fmtDate(d.expiry_date)}
+              </div>
+              <div className="rec__actions">
+                <button
+                  className="btn btn--sm"
+                  disabled={downloading === d.id}
+                  onClick={() => void onDownload(d.id, d.original_filename)}
+                >
+                  {downloading === d.id ? "..." : "Download"}
+                </button>
+                {can.reviewDocuments(user?.staff_role) && d.status === "pending" && (
+                  <button className="btn btn--sm btn--primary" onClick={() => setReviewDocId(d.id)}>
+                    Review
+                  </button>
+                )}
+              </div>
+            </article>
+          ))
+        )}
       </section>
 
       <section className="card">
         <h2>Users</h2>
-        <DataTable
-          rows={company.users}
-          columns={userColumns}
-          rowKey={(u) => u.id}
-          empty="No users on this company."
-        />
+        {company.users.length === 0 ? (
+          <p className="empty">No users on this company.</p>
+        ) : (
+          company.users.map((u) => (
+            <dl className="kv" key={u.id}>
+              <dt>{u.full_name}</dt>
+              <dd>
+                {u.email}
+                {u.phone ? ` · ${u.phone}` : ""}
+              </dd>
+            </dl>
+          ))
+        )}
       </section>
 
       <Modal open={rejecting} title="Reject company" onClose={closeReject}>
@@ -269,7 +262,7 @@ export function CompanyDetail() {
             Cancel
           </button>
           <button
-            className="btn btn--danger"
+            className="btn btn--danger-solid"
             disabled={!reasonOk || reject.isPending}
             onClick={onReject}
           >

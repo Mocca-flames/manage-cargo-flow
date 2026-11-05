@@ -63,9 +63,8 @@ export function Users() {
       <section className="card users-form">
         <h2>Create user</h2>
         <p className="muted">
-          A temporary password is emailed; the user must change it at first login. Staff roles
-          require an email on an allowed company domain. Only a director can create admin or
-          director accounts.
+          Temporary password is emailed and must be changed at first login. Staff roles need an
+          allowed company email domain; admin/director roles are director-only.
         </p>
         <form className="stack" onSubmit={onSubmit}>
           <Field label="Email *">
@@ -104,7 +103,7 @@ export function Users() {
               </select>
             )}
           </Field>
-          <Field label="Company ID" hint="Optional. Leave empty for no company.">
+          <Field label="Company ID" hint="Optional — none if empty.">
             {(id) => (
               <input
                 id={id}
@@ -125,10 +124,7 @@ export function Users() {
 
       <section className="card">
         <h2>User list</h2>
-        <p className="muted">
-          Not available yet: the backend has no <code>GET /users</code> endpoint, so there is
-          nothing to list. This screen will grow when that endpoint exists.
-        </p>
+        <p className="muted">Coming soon — needs a <code>GET /users</code> endpoint.</p>
       </section>
     </>
   );
