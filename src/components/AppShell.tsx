@@ -67,7 +67,7 @@ function screenTitle(pathname: string): string {
 }
 
 export function AppShell() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { pathname } = useLocation();
   const queryClient = useQueryClient();
   const toast = useToast();
@@ -108,9 +108,6 @@ export function AppShell() {
             aria-label="Refresh data and check for app updates"
           >
             Refresh
-          </button>
-          <button className="topbar__logout" onClick={logout} aria-label="Log out">
-            Exit
           </button>
         </div>
       </header>
