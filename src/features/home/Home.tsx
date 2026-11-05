@@ -1,5 +1,6 @@
 ﻿import { Link } from "react-router";
 import { useAuth } from "../../auth/context/AuthContext";
+import { SiteStats } from "./SiteStats";
 
 declare const __APP_VERSION__: string;
 
@@ -30,6 +31,8 @@ export function Home() {
           </Link>
         ))}
       </div>
+
+      <SiteStats />
 
       <p className="muted centered">
         Build {__APP_VERSION__}

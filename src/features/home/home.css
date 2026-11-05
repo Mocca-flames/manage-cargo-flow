@@ -1,0 +1,131 @@
+@layer features {
+  .home-stats {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .home-stats__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .home-stats__toggle {
+    display: flex;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+
+  .home-stats__seg {
+    min-height: var(--tap);
+    padding: 0 var(--space-3);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: var(--text-sm);
+  }
+
+  .home-stats__seg--on {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow);
+  }
+
+  .home-stats__cards {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  }
+
+  .home-stats__card {
+    gap: var(--space-1);
+  }
+
+  .home-stats__num {
+    font-size: var(--text-xl);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .home-stats__segbar {
+    display: flex;
+    height: 0.75rem;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--surface-2);
+  }
+
+  .home-stats__segbar span {
+    display: block;
+    height: 100%;
+  }
+
+  .home-stats__legend,
+  .home-stats__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .home-stats__legend li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+  }
+
+  .home-stats__legend-label {
+    flex: 1;
+    text-transform: capitalize;
+  }
+
+  .home-stats__list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  .home-stats__dot {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+
+  .home-stats__path {
+    overflow-wrap: anywhere;
+  }
+
+  .home-stats__spark {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 4.5rem;
+    padding-top: var(--space-2);
+  }
+
+  .home-stats__spark-bar {
+    flex: 1;
+    min-height: 3px;
+    background: var(--brand);
+    border-radius: 2px 2px 0 0;
+  }
+
+  .home-stats__spark-bar--empty {
+    background: var(--surface-2);
+  }
+
+  .home-stats__footnote {
+    font-size: var(--text-sm);
+  }
+}
