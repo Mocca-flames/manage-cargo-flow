@@ -38,7 +38,8 @@ export function SiteStats() {
       if (!res.ok) throw new Error(`request failed (${res.status})`);
       return (await res.json()) as SiteStatsData;
     },
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30_000,
+    refetchInterval: 60_000,
   });
 
   const deviceTotal = data?.devices.reduce((sum, d) => sum + d.visits, 0) ?? 0;

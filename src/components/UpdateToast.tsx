@@ -1,20 +1,35 @@
+import { useEffect, useRef } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
-const HOUR = 60 * 60 * 1000;
+const FIFTEEN_MIN = 15 * 60 * 1000;
 
 export function UpdateToast() {
+  const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
   } = useRegisterSW({
-    // An installed app can stay open all day. Check for a new build every hour.
+    // An installed app can stay open all day. Check for a new build every 15 minutes.
     onRegisteredSW(_url, registration) {
+      registrationRef.current = registration ?? null;
       if (!registration) return;
       window.setInterval(() => {
         if (navigator.onLine) void registration.update();
-      }, HOUR);
+      }, FIFTEEN_MIN);
     },
   });
+
+  // Also check for a new build whenever the tab regains focus, so a deploy
+  // made while the admin was away is picked up on their next look.
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible' && navigator.onLine) {
+        void registrationRef.current?.update();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
 
   if (!needRefresh) return null;
   return (

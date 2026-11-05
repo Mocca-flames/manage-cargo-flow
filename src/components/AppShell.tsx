@@ -1,6 +1,8 @@
 import { NavLink, Outlet, useLocation } from "react-router";
 import type { ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../auth/context/AuthContext";
+import { useToast } from "./toast";
 
 declare const __APP_VERSION__: string;
 
@@ -67,7 +69,20 @@ function screenTitle(pathname: string): string {
 export function AppShell() {
   const { user, logout } = useAuth();
   const { pathname } = useLocation();
+  const queryClient = useQueryClient();
+  const toast = useToast();
   const firstName = user?.full_name?.split(" ")[0];
+
+  async function refresh() {
+    if (!navigator.onLine) {
+      toast.push("You are offline — cannot refresh.", "error");
+      return;
+    }
+    await queryClient.invalidateQueries();
+    const registration = await navigator.serviceWorker.getRegistration();
+    if (registration) void registration.update();
+    toast.push("Refreshed — data checked for updates.");
+  }
 
   return (
     <div className="app">
@@ -86,9 +101,18 @@ export function AppShell() {
           </small>
         </div>
         <div className="topbar__spacer" />
-        <button className="topbar__logout" onClick={logout} aria-label="Log out">
-          Exit
-        </button>
+        <div className="topbar__actions">
+          <button
+            className="topbar__logout"
+            onClick={() => void refresh()}
+            aria-label="Refresh data and check for app updates"
+          >
+            Refresh
+          </button>
+          <button className="topbar__logout" onClick={logout} aria-label="Log out">
+            Exit
+          </button>
+        </div>
       </header>
       <main className="page">
         <Outlet />

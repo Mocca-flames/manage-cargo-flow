@@ -75,6 +75,12 @@
 
   .topbar__spacer { flex: 1; }
 
+  .topbar__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
   .topbar__logout {
     margin-left: auto;
     padding: 6px 12px;
