@@ -16,6 +16,7 @@ dist-ssr
 .dev.vars
 
 # Editor directories and files
+*.apk
 .vscode/*
 !.vscode/extensions.json
 .idea
