@@ -20,7 +20,7 @@
 
     &.btn--primary { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-canvas); }
     &.btn--gold { background: var(--color-accent-gold); border-color: var(--color-accent-gold); color: var(--color-ink); }
-    &.btn--danger { background: transparent; border-color: transparent; color: var(--color-accent-terracotta); }
+    &.btn--danger { background: transparent; border-color: var(--color-accent-terracotta); color: var(--color-accent-terracotta); }
     &.btn--danger-solid { background: var(--color-accent-terracotta); border-color: var(--color-accent-terracotta); color: #fff; }
     &.btn--ghost { background: transparent; border-color: transparent; }
     &.btn--sm { min-height: 2.25rem; padding: 7px 14px; font-size: var(--text-label); border-radius: 12px; }
