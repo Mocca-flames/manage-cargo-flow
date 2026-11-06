@@ -17,7 +17,7 @@ echo "=== Git push ==="
 git push origin master
 
 echo "=== Wrangler deploy ==="
-npx wrangler pages deploy dist --project-name=cargo-flow-admin --branch=main
+npx wrangler pages deploy dist --project-name=cargoflowafrica-manage --branch=main
 
 echo
 echo "Done. https://manage.cargoflowafrica.co.za"

@@ -21,7 +21,7 @@ git push origin master
 if errorlevel 1 goto :fail
 
 echo === Wrangler deploy ===
-npx wrangler pages deploy dist --project-name=cargo-flow-admin --branch=main
+npx wrangler pages deploy dist --project-name=cargoflowafrica-manage --branch=main
 if errorlevel 1 goto :fail
 
 echo.

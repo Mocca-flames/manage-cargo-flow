@@ -7,16 +7,16 @@ Everything here was **verified live** on 2026-11-06 (commands actually run, quer
 ## 1. Deployment (read this first — branch gotcha)
 
 - **Hosting:** Cloudflare Pages, direct upload (no git integration, no auto-deploy on push).
-- **Project name:** `cargo-flow-admin` → https://cargo-flow-admin.pages.dev
+- **Project name:** `cargoflowafrica-manage` → https://cargoflowafrica-manage.pages.dev
 - **Local git branch is `master`, but the Pages production branch is `main`.**
   Deploying without `--branch=main` silently creates a *preview* deployment that nobody sees.
   ```bash
   npm run build && npm run lint
-  npx wrangler pages deploy dist --project-name cargo-flow-admin --branch=main
+  npx wrangler pages deploy dist --project-name cargoflowafrica-manage --branch=main
   ```
 - The repo has **no git remote** — commits are local only. Nothing pushes anywhere.
 - Production previously served an old vanilla-JS prototype (deployed from commits not in this repo). Replaced by this React app on 2026-11-06.
-  Rollback if ever needed: Dashboard → Pages → `cargo-flow-admin` → Deployments → roll back to `dd9b28a2`.
+  Rollback if ever needed: Dashboard → Pages → `cargoflowafrica-manage` → Deployments.
 - Commit convention: one commit per phase/feature (`feat: …`, `phase N: …`).
 
 ## 2. Cloudflare account
@@ -62,7 +62,7 @@ POST https://api.cloudflare.com/client/v4/graphql   (Web Analytics / RUM dataset
 ### Secrets
 - `CF_API_TOKEN` — read-only API token (Account Analytics: Read), stored as a **Pages secret**:
   ```bash
-  npx wrangler pages secret put CF_API_TOKEN --project-name cargo-flow-admin
+  npx wrangler pages secret put CF_API_TOKEN --project-name cargoflowafrica-manage
   ```
 - Secrets are **per environment**: production and preview have separate sets. We set production only. A `--branch=master` preview deploy will return `{"error":"CF_API_TOKEN is not configured"}` until you set the secret for preview too.
 - Local function testing: put `CF_API_TOKEN=...` in `.dev.vars` (gitignored) and run `npx wrangler pages dev dist`.
@@ -105,21 +105,21 @@ Rules learned the hard way:
 # auth / discovery
 npx wrangler whoami
 npx wrangler pages project list
-npx wrangler pages deployment list --project-name cargo-flow-admin
+npx wrangler pages deployment list --project-name cargoflowafrica-manage
 
 # build & check (must both pass before deploying)
 npm run build && npm run lint
 
 # deploy TO PRODUCTION (note --branch=main, see §1)
-npx wrangler pages deploy dist --project-name cargo-flow-admin --branch=main
+npx wrangler pages deploy dist --project-name cargoflowafrica-manage --branch=main
 
 # secrets
-npx wrangler pages secret put CF_API_TOKEN --project-name cargo-flow-admin   # prompts / accepts piped stdin
+npx wrangler pages secret put CF_API_TOKEN --project-name cargoflowafrica-manage   # prompts / accepts piped stdin
 
 # smoke-test after deploy
-curl -s "https://cargo-flow-admin.pages.dev/api/analytics?site=all"
-curl -s "https://cargo-flow-admin.pages.dev/api/analytics?site=za"
-curl -s -o /dev/null -w "%{http_code}" "https://cargo-flow-admin.pages.dev/companies"   # SPA deep link = 200
+curl -s "https://cargoflowafrica-manage.pages.dev/api/analytics?site=all"
+curl -s "https://cargoflowafrica-manage.pages.dev/api/analytics?site=za"
+curl -s -o /dev/null -w "%{http_code}" "https://cargoflowafrica-manage.pages.dev/companies"   # SPA deep link = 200
 ```
 
 PowerShell note: when curling the GraphQL API, build the JSON body with `ConvertTo-Json` or a temp file — quoting inline mangles it.
