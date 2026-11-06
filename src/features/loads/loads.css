@@ -1,0 +1,57 @@
+@layer features {
+  .loads-filters {
+    align-items: end;
+  }
+
+  .loads__rate {
+    font: 600 1.25rem/1.2 var(--font-display);
+    letter-spacing: -0.01em;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .loads__backload {
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    background: var(--color-canvas);
+    border: 1px dashed var(--color-accent-gold);
+    border-radius: var(--radius-sm);
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .loads__backload-label {
+    font-size: var(--text-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-accent-gold);
+  }
+
+  .rec__route--sm {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .rec__route--sm span::before {
+    width: 9px;
+    height: 9px;
+    border-width: 2.5px;
+    top: 7px;
+  }
+
+  .loads-backload-form {
+    border: 1px solid var(--color-accent-gold);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    display: grid;
+    gap: var(--space-3);
+    background: var(--color-canvas);
+
+    & legend {
+      font-weight: 700;
+      font-size: var(--text-sm);
+      padding: 0 var(--space-1);
+      color: var(--color-accent-gold);
+    }
+  }
+}

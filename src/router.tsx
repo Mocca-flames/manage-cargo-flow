@@ -5,6 +5,7 @@ import { Login } from "./features/auth/Login";
 import { ChangePassword } from "./features/auth/ChangePassword";
 import { AppShell } from "./components/AppShell";
 import { Home } from "./features/home/Home";
+import { Loads } from "./features/loads/Loads";
 import { Companies } from "./features/companies/Companies";
 import { CompanyDetail } from "./features/companies/CompanyDetail";
 import { Interests } from "./features/interests/Interests";
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
             element: <AppShell />,
             children: [
               { index: true, element: <Home /> },
+              { path: "/loads", element: <Loads /> },
               { path: "/companies", element: <Companies /> },
               { path: "/companies/:id", element: <CompanyDetail /> },
               { path: "/companies/:id/documents", element: <CompanyDetail /> },

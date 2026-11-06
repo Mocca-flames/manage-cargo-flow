@@ -1,54 +1,31 @@
 import { NavLink, Outlet, useLocation } from "react-router";
 import type { ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { LuHouse, LuTruck, LuBuilding2, LuHandshake, LuUsers } from "react-icons/lu";
 import { useAuth } from "../auth/context/AuthContext";
 import { useToast } from "./toast";
 
 declare const __APP_VERSION__: string;
 
 const ICONS: Record<string, ReactNode> = {
-  home: (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" />
-      <path d="M9 21v-7h6v7" />
-    </svg>
-  ),
-  companies: (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 21h18" />
-      <path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16" />
-      <path d="M15 21V9h4a2 2 0 0 1 2 2v10" />
-      <path d="M9 7h2M9 11h2M9 15h2M17 13h1M17 17h1" />
-    </svg>
-  ),
-  interests: (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11" />
-      <path d="M14 9h4l4 4v4c0 .6-.4 1-1 1h-2" />
-      <circle cx="7" cy="18" r="2" />
-      <circle cx="17" cy="18" r="2" />
-      <path d="M9 18h6" />
-    </svg>
-  ),
-  users: (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  ),
+  home: <LuHouse />,
+  loads: <LuTruck />,
+  companies: <LuBuilding2 />,
+  interests: <LuHandshake />,
+  users: <LuUsers />,
 };
 
 // Short labels: one line, never clip on a 320px phone.
 const TABS = [
   { to: "/", label: "Home", icon: "home", end: true },
+  { to: "/loads", label: "Loads", icon: "loads" },
   { to: "/companies", label: "Cos.", icon: "companies" },
   { to: "/interests", label: "Leads", icon: "interests" },
   { to: "/users", label: "Users", icon: "users" },
 ];
 
 function screenTitle(pathname: string): string {
+  if (pathname.startsWith("/loads")) return "Loads";
   if (pathname.startsWith("/companies/") && pathname.endsWith("/documents")) return "Company Documents";
   if (pathname.startsWith("/companies/")) return "Company";
   if (pathname.startsWith("/companies")) return "Companies";
