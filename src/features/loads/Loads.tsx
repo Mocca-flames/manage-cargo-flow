@@ -693,14 +693,11 @@ function EditLoadModal({ load, onClose, onDone }: EditModalProps) {
           </Field>
 
           <div className="modal__actions">
-            <button className="btn btn--danger" disabled={remove.isPending} onClick={handleDelete}>
-              {remove.isPending ? "Deleting..." : "Delete"}
-            </button>
-            <button className="btn" onClick={onClose}>
-              Cancel
-            </button>
             <button className="btn btn--primary" disabled={update.isPending} onClick={submit}>
               {update.isPending ? "Saving..." : "Save"}
+            </button>
+            <button className="btn btn--danger" disabled={remove.isPending} onClick={handleDelete}>
+              {remove.isPending ? "Deleting..." : "Delete"}
             </button>
           </div>
         </>
