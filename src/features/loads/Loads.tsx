@@ -517,6 +517,7 @@ interface EditModalProps {
 function EditLoadModal({ load, onClose, onDone }: EditModalProps) {
   const toast = useToast();
   const update = $api.useMutation("patch", "/loads/{load_id}");
+  const remove = $api.useMutation("delete", "/loads/{load_id}");
   const [status, setStatus] = useState("");
   const [trucksNeeded, setTrucksNeeded] = useState("");
   const [rate, setRate] = useState("");
@@ -561,6 +562,22 @@ function EditLoadModal({ load, onClose, onDone }: EditModalProps) {
       {
         onSuccess: () => {
           toast.push("Load updated");
+          onDone();
+          onClose();
+        },
+        onError: (e) => toast.push(errorMessage(e), "error"),
+      },
+    );
+  }
+
+  function handleDelete() {
+    if (!load) return;
+    if (!window.confirm(`Delete load #${load.id} (${load.origin} → ${load.destination})? This cannot be undone.`)) return;
+    remove.mutate(
+      { params: { path: { load_id: load.id } } },
+      {
+        onSuccess: () => {
+          toast.push("Load deleted");
           onDone();
           onClose();
         },
@@ -676,6 +693,9 @@ function EditLoadModal({ load, onClose, onDone }: EditModalProps) {
           </Field>
 
           <div className="modal__actions">
+            <button className="btn btn--danger" disabled={remove.isPending} onClick={handleDelete}>
+              {remove.isPending ? "Deleting..." : "Delete"}
+            </button>
             <button className="btn" onClick={onClose}>
               Cancel
             </button>

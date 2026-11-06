@@ -496,7 +496,8 @@ export interface paths {
         get: operations["get_load_loads__load_id__get"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete Load */
+        delete: operations["delete_load_loads__load_id__delete"];
         options?: never;
         head?: never;
         /** Update Load */
@@ -703,7 +704,10 @@ export interface components {
         };
         /** Body_upload_document_documents_upload_post */
         Body_upload_document_documents_upload_post: {
-            /** File */
+            /**
+             * File
+             * Format: binary
+             */
             file: string;
             /** Document Type Id */
             document_type_id?: number | null;
@@ -904,6 +908,8 @@ export interface components {
             expiry_date: string | null;
             /** Status */
             status: string;
+            /** Review Note */
+            review_note: string | null;
             /**
              * Created At
              * Format: date-time
@@ -1488,10 +1494,6 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
-            /** Input */
-            input?: unknown;
-            /** Context */
-            ctx?: Record<string, never>;
         };
         /** VerifyOtpIn */
         VerifyOtpIn: {
@@ -2616,6 +2618,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["LoadOut"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_load_loads__load_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                load_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
