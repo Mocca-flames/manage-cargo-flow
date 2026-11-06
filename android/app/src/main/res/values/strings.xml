@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Cargo Flow</string>
-    <string name="title_activity_main">Cargo Flow</string>
-    <string name="package_name">za.co.cargoflowafrica.manage</string>
-    <string name="custom_url_scheme">za.co.cargoflowafrica.manage</string>
-</resources>
