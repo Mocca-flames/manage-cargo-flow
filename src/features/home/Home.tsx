@@ -5,8 +5,8 @@ import { SiteStats } from "./SiteStats";
 declare const __APP_VERSION__: string;
 
 const QUICK = [
-  { to: "/companies", label: "Companies", hint: "Verify & review" },
-  { to: "/documents", label: "Documents", hint: "Review uploads" },
+  { to: "/companies", label: "Companies", hint: "Verify & compliance" },
+  { to: "/companies", label: "Documents", hint: "Manage per company" },
   { to: "/interests", label: "Load interests", hint: "Handle new leads" },
   { to: "/users", label: "Users", hint: "Create staff accounts" },
 ];

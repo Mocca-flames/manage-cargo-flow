@@ -21,13 +21,6 @@ const ICONS: Record<string, ReactNode> = {
       <path d="M9 7h2M9 11h2M9 15h2M17 13h1M17 17h1" />
     </svg>
   ),
-  documents: (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
-      <path d="M14 3v5h5" />
-      <path d="M9 13h6M9 17h6" />
-    </svg>
-  ),
   interests: (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11" />
@@ -51,12 +44,12 @@ const ICONS: Record<string, ReactNode> = {
 const TABS = [
   { to: "/", label: "Home", icon: "home", end: true },
   { to: "/companies", label: "Cos.", icon: "companies" },
-  { to: "/documents", label: "Docs", icon: "documents" },
   { to: "/interests", label: "Leads", icon: "interests" },
   { to: "/users", label: "Users", icon: "users" },
 ];
 
 function screenTitle(pathname: string): string {
+  if (pathname.startsWith("/companies/") && pathname.endsWith("/documents")) return "Company Documents";
   if (pathname.startsWith("/companies/")) return "Company";
   if (pathname.startsWith("/companies")) return "Companies";
   if (pathname.startsWith("/documents")) return "Documents";

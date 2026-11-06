@@ -1,11 +1,17 @@
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 
-interface Props { open: boolean; title: string; onClose: () => void; children: ReactNode }
+interface Props {
+  open: boolean;
+  title: string;
+  onClose: () => void;
+  children: ReactNode;
+  className?: string;
+}
 
 // Uses the native <dialog> element, styled as a mobile bottom sheet.
 // Children render only while open, so forms reset every time.
-export function Modal({ open, title, onClose, children }: Props) {
+export function Modal({ open, title, onClose, children, className }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -18,7 +24,7 @@ export function Modal({ open, title, onClose, children }: Props) {
   return (
     <dialog
       ref={ref}
-      className='modal'
+      className={`modal ${className ?? ''}`.trim()}
       onClose={onClose}
       onClick={(e) => { if (e.target === ref.current) onClose(); }}
     >

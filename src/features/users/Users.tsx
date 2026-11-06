@@ -17,11 +17,21 @@ export function Users() {
   const queryClient = useQueryClient();
   const create = $api.useMutation("post", "/users");
 
+  const { data: companiesData } = $api.useQuery("get", "/companies", {
+    params: { query: { limit: 100 } },
+  });
+
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [role, setRole] = useState("user");
   const [companyId, setCompanyId] = useState("");
+
+  const companyOptions = (companiesData ?? []).slice().sort((a, b) => {
+    const nameA = a.trading_name ?? a.legal_name;
+    const nameB = b.trading_name ?? b.legal_name;
+    return nameA.localeCompare(nameB);
+  });
 
   // Only a director may create admin/director accounts (server enforces too).
   const privileged = can.createPrivilegedStaff(user?.staff_role);
@@ -103,15 +113,16 @@ export function Users() {
               </select>
             )}
           </Field>
-          <Field label="Company ID" hint="Optional — none if empty.">
+          <Field label="Company" hint="Optional — select for company users, none for internal staff.">
             {(id) => (
-              <input
-                id={id}
-                type="number"
-                min={1}
-                value={companyId}
-                onChange={(e) => setCompanyId(e.target.value)}
-              />
+              <select id={id} value={companyId} onChange={(e) => setCompanyId(e.target.value)}>
+                <option value="">None (Internal staff)</option>
+                {companyOptions.map((c) => (
+                  <option key={c.id} value={String(c.id)}>
+                    {c.trading_name ? `${c.trading_name} (${c.legal_name})` : c.legal_name}
+                  </option>
+                ))}
+              </select>
             )}
           </Field>
           <div className="cluster">

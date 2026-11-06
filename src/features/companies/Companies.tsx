@@ -63,9 +63,11 @@ export function Companies() {
       {!isPending &&
         !error &&
         rows.map((c) => (
-          <Link className="rec" key={c.id} to={`/companies/${c.id}`}>
+          <article className="rec" key={c.id}>
             <div className="rec__row">
-              <span className="rec__title">{c.trading_name ?? c.legal_name}</span>
+              <Link to={`/companies/${c.id}`} className="rec__title" style={{ textDecoration: "none" }}>
+                {c.trading_name ?? c.legal_name}
+              </Link>
               <StatusBadge status={c.status} />
             </div>
             <div className="rec__meta">
@@ -77,7 +79,15 @@ export function Companies() {
               ))}
             </div>
             <div className="rec__meta">Created {fmtDate(c.created_at)}</div>
-          </Link>
+            <div className="rec__actions">
+              <Link to={`/companies/${c.id}`} className="btn btn--sm">
+                Overview
+              </Link>
+              <Link to={`/companies/${c.id}/documents`} className="btn btn--sm btn--primary">
+                Documents &rarr;
+              </Link>
+            </div>
+          </article>
         ))}
       {!isPending && !error && rows.length > 0 && (
         <Pagination
