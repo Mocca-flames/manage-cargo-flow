@@ -20,6 +20,7 @@ const LIMIT = 50;
 const STATUS_OPTIONS = ["open", "assigned", "closed"];
 const TRUCK_TYPES = [
   "superlink",
+  "triaxle",
   "flatbed",
   "tautliner",
   "tipper",
